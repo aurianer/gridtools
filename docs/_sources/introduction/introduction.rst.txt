@@ -90,6 +90,7 @@ and run the gridtools tests.
  GT_ENABLE_BACKEND_X86  # For cache based multicores
  GT_ENABLE_BACKEND_NAIVE  # For naive implementation
  GT_ENABLE_BACKEND_MC   # For optimized multicores and KNL
+ GT_ENABLE_BACKEND_HPX   # For the use of `HPX <https://stellar-group.github.io/hpx-docs/latest/html/index.html>`_ backend
 
 All the targets can be installed and used at the same time, but some runtime components may lead to incompatibilities or complex environments to make the codes run. It may be more effective to do multiple installs of the library for different targets in this case.
 
@@ -151,6 +152,7 @@ and setting Clang as the main C++ compiler. A fully working command for configur
      -DGT_ENABLE_BACKEND_MC=OFF \
      -DGT_ENABLE_BACKEND_X86=OFF \
      -DGT_ENABLE_BACKEND_NAIVE=OFF \
+     -DGT_ENABLE_BACKEND_HPX=OFF \
      -DCMAKE_INSTALL_PREFIX=/usr/local \
      ..
 
@@ -169,6 +171,7 @@ and the C++ compiler to HIPCC. For example:
      -DGT_ENABLE_BACKEND_MC=OFF \
      -DGT_ENABLE_BACKEND_X86=OFF \
      -DGT_ENABLE_BACKEND_NAIVE=OFF \
+     -DGT_ENABLE_BACKEND_HPX=OFF \
      -DCMAKE_INSTALL_PREFIX=/usr/local \
      ..
 

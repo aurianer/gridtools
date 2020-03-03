@@ -8,6 +8,8 @@ option(GT_ENABLE_BACKEND_CUDA "Compile CUDA GPU backend examples and unit tests"
 option(GT_ENABLE_BACKEND_X86 "Compile x86 backend examples and unit tests" ${OPENMP_AVAILABLE} )
 option(GT_ENABLE_BACKEND_NAIVE "Compile naive backend examples and unit tests" ON)
 option(GT_ENABLE_BACKEND_MC "Compile MC backend examples and unit tests" ${OPENMP_AVAILABLE} )
+# FIXME change openmp_available to if hpx has been found
+option(GT_ENABLE_BACKEND_HPX "Compile hpx backend examples and unit tests" OFF )
 option(GT_USE_MPI "Compile with MPI support" ${MPI_AVAILABLE} )
 
 # TODO remove when implementing smaller-grained test enablers

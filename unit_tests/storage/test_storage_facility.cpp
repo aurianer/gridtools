@@ -80,7 +80,7 @@ static_assert(expect_custom_layout<2, 1, 0>, "");
 static_assert(expect_custom_layout<1, 0>, "");
 static_assert(expect_custom_layout<2, -1, 1, 0>, "");
 
-#if defined(GT_BACKEND_X86) || defined(GT_BACKEND_NAIVE)
+#if defined(GT_BACKEND_X86) || defined(GT_BACKEND_NAIVE) || defined(GT_BACKEND_HPX)
 
 static_assert(expect_layout<0>, "");
 static_assert(expect_layout<0, 1>, "");
