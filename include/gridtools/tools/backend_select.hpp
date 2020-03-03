@@ -32,6 +32,9 @@ using backend_t = gridtools::mc::backend;
 #include "../stencil_composition/backend/cuda.hpp"
 using backend_t = gridtools::cuda::backend<>;
 #endif
+#elif defined(GT_BACKEND_HPX)
+#include "../stencil_composition/backend/hpx.hpp"
+using backend_t = gridtools::hpx::backend<>;
 #endif
 
 // default timer implementation
@@ -55,7 +58,8 @@ using gcl_arch_t = gridtools::gcl_cpu;
 #if defined(GT_BACKEND_CUDA)
 #include "../storage/cuda.hpp"
 using storage_traits_t = gridtools::storage::cuda;
-#elif defined(GT_BACKEND_X86) || defined(GT_BACKEND_NAIVE)
+#elif defined(GT_BACKEND_X86) || defined(GT_BACKEND_NAIVE) \
+    || defined(GT_BACKEND_HPX)
 #include "../storage/x86.hpp"
 using storage_traits_t = gridtools::storage::x86;
 #elif defined(GT_BACKEND_MC)

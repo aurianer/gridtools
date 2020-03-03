@@ -71,9 +71,16 @@ endif()
 if(MPI_AVAILABLE)
     target_compile_definitions(gridtools INTERFACE GCL_MPI)
     if(GT_ENABLE_BACKEND_CUDA)
-      target_compile_definitions(gridtools INTERFACE GCL_GPU)
+        target_compile_definitions(gridtools INTERFACE GCL_GPU)
     endif()
 endif()
+
+if(GT_ENABLE_BACKEND_HPX)
+    find_package(HPX REQUIRED)
+    # We temporary link to HPX_LIBRARIES, HPX::hpx target PR is not merged yet
+    target_link_libraries(gridtools INTERFACE ${HPX_LIBRARIES})
+    target_compile_definitions(gridtools INTERFACE GT_BACKEND_HPX)
+endif(GT_ENABLE_BACKEND_HPX)
 
 add_library(GridToolsTest INTERFACE)
 target_link_libraries(GridToolsTest INTERFACE gridtools)
@@ -149,6 +156,13 @@ if(GT_ENABLE_BACKEND_MC)
     target_link_libraries(GridToolsTestMC INTERFACE GridToolsTest)
 endif()
 
+if(GT_ENABLE_BACKEND_HPX)
+    add_library(GridToolsTestHPX INTERFACE)
+    target_compile_definitions(GridToolsTestHPX INTERFACE GT_BACKEND_HPX)
+    target_link_libraries(GridToolsTestHPX INTERFACE GridToolsTest)
+endif()
+
+
 # TODO: Move to separate file?
 if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     # TODO add those flags to documentation (slightly improve performance)
@@ -163,7 +177,7 @@ if(GT_SINGLE_PRECISION)
     message(STATUS "Compile tests in single precision")
 else()
     target_compile_definitions(GridToolsTest INTERFACE GT_FLOAT_PRECISION=8)
-   message(STATUS "Compile tests in double precision")
+    message(STATUS "Compile tests in double precision")
 endif()
 
 # add a target to generate API documentation with Doxygen

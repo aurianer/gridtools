@@ -32,9 +32,11 @@ endmacro(detect_cuda)
 macro(detect_openmp)
 
     set( _find_openmp FALSE )
-    if (NOT DEFINED GT_ENABLE_BACKEND_X86 AND NOT DEFINED GT_ENABLE_BACKEND_MC AND NOT DEFINED GT_ENABLE_BACKEND_NAIVE)
+    if (NOT DEFINED GT_ENABLE_BACKEND_X86 AND NOT DEFINED GT_ENABLE_BACKEND_MC
+        AND NOT DEFINED GT_ENABLE_BACKEND_NAIVE AND NOT DEFINED GT_ENABLE_BACKEND_HPX)
         set( _find_openmp TRUE )
-    elseif (GT_ENABLE_BACKEND_X86 OR GT_ENABLE_BACKEND_MC OR GT_ENABLE_BACKEND_NAIVE)
+    elseif (GT_ENABLE_BACKEND_X86 OR GT_ENABLE_BACKEND_MC OR
+        GT_ENABLE_BACKEND_NAIVE OR GT_ENABLE_BACKEND_HPX)
         set( _find_openmp TRUE )
     endif()
 
@@ -46,7 +48,8 @@ macro(detect_openmp)
     elseif(GT_CUDA_COMPILATION_TYPE STREQUAL "Clang-CUDA")
         set (OPENMP_AVAILABLE OFF)
         message (STATUS "OpenMP not avaiable with Clang CUDA")
-    elseif (NOT DEFINED GT_ENABLE_BACKEND_X86 AND NOT DEFINED GT_ENABLE_BACKEND_MC AND NOT DEFINED GT_ENABLE_BACKEND_NAIVE)
+    elseif (NOT DEFINED GT_ENABLE_BACKEND_X86 AND NOT DEFINED GT_ENABLE_BACKEND_MC
+        AND NOT DEFINED GT_ENABLE_BACKEND_NAIVE AND NOT DEFINED GT_ENABLE_BACKEND_HPX)
         find_package( OpenMP COMPONENTS CXX)
         if (TARGET OpenMP::OpenMP_CXX)
             set (OPENMP_AVAILABLE ON)
@@ -56,7 +59,8 @@ macro(detect_openmp)
             message (STATUS "OpenMP NOT found")
         endif ()
 
-    elseif (GT_ENABLE_BACKEND_X86 OR GT_ENABLE_BACKEND_MC OR GT_ENABLE_BACKEND_NAIVE)
+    elseif (GT_ENABLE_BACKEND_X86 OR GT_ENABLE_BACKEND_MC OR
+        GT_ENABLE_BACKEND_NAIVE OR GT_ENABLE_BACKEND_HPX)
         if (GT_CUDA_COMPILATION_TYPE STREQUAL "Clang-CUDA")
             message (FATAL_ERROR "OpenMP backends can not be used in combination with Clang CUDA/HIP due to bug https://bugs.llvm.org/show_bug.cgi?id=42061")
         endif ()
