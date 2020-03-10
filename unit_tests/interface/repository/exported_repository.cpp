@@ -7,6 +7,11 @@
  * Please, refer to the LICENSE file in the root directory.
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#ifdef GT_BACKEND_HPX
+// hpx/config.hpp must be included before boost/config header
+#include <hpx/config.hpp>
+#endif
+
 #include <gtest/gtest.h>
 
 #include <cpp_bindgen/export.hpp>
