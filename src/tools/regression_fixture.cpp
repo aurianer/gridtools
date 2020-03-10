@@ -9,6 +9,10 @@
  */
 #include <gridtools/tools/regression_fixture_impl.hpp>
 
+#ifdef GT_BACKEND_HPX
+#include <hpx/hpx_init.hpp>
+#endif
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -54,9 +58,21 @@ namespace gridtools {
     } // namespace _impl
 } // namespace gridtools
 
+#ifdef GT_BACKEND_HPX
+int hpx_main() {
+    int error_code = RUN_ALL_TESTS();
+    hpx::finalize();
+    return error_code;
+}
+#endif
+
 int main(int argc, char **argv) {
-    // Pass command line arguments to googltest
+    // Pass command line arguments to googletest
     ::testing::InitGoogleTest(&argc, argv);
     gridtools::_impl::regression_fixture_base::init(argc, argv);
+#ifdef GT_BACKEND_HPX
+    return hpx::init(argc, argv);
+#else
     return RUN_ALL_TESTS();
+#endif
 }
