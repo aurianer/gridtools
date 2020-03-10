@@ -9,6 +9,10 @@
  */
 #pragma once
 
+#include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+#include <hpx/parallel/algorithm.hpp>
+
 #include <memory>
 #include <utility>
 
@@ -69,7 +73,7 @@ namespace gridtools {
                        strides = std::move(strides),
                        k_loop = std::move(k_loop)](int_t i_block, int_t j_block, int_t i_size, int_t j_size) {
                 ptr_diff_t offset{};
-                sid::shift(offset, sid::get_stride<dim::thread>(strides), omp_get_thread_num());
+                sid::shift(offset, sid::get_stride<dim::thread>(strides), ::hpx::get_worker_thread_num());
                 sid::shift(offset, sid::get_stride<sid::blocked_dim<dim::i>>(strides), i_block);
                 sid::shift(offset, sid::get_stride<sid::blocked_dim<dim::j>>(strides), j_block);
                 auto ptr = origin() + offset;
@@ -101,7 +105,7 @@ namespace gridtools {
                         grid.k_size(interval, extent),
                         extent.extend(dim::j(), JBlockSize()),
                         extent.extend(dim::i(), IBlockSize()),
-                        omp_get_max_threads());
+                        ::hpx::get_num_worker_threads());
 
                 using stride_kind = meta::list<decltype(extent), decltype(num_colors)>;
                 return sid::shift_sid_origin(
@@ -120,20 +124,28 @@ namespace gridtools {
             auto stage_loops = tuple_util::transform(
                 [&](auto stage) { return make_stage_loop(stage, grid, data_stores); }, meta::rename<tuple, stages_t>());
 
-            int_t total_i = grid.i_size();
-            int_t total_j = grid.j_size();
+            int total_i = grid.i_size();
+            int total_j = grid.j_size();
 
-            int_t NBI = (total_i + IBlockSize::value - 1) / IBlockSize::value;
-            int_t NBJ = (total_j + JBlockSize::value - 1) / JBlockSize::value;
+            int NBI = (total_i + IBlockSize::value - 1) / IBlockSize::value;
+            int NBJ = (total_j + JBlockSize::value - 1) / JBlockSize::value;
 
-#pragma omp parallel for collapse(2)
-            for (int_t bi = 0; bi < NBI; ++bi) {
-                for (int_t bj = 0; bj < NBJ; ++bj) {
-                    int_t i_size = bi + 1 == NBI ? total_i - bi * IBlockSize::value : IBlockSize::value;
-                    int_t j_size = bj + 1 == NBJ ? total_j - bj * JBlockSize::value : JBlockSize::value;
+            // HPX for loop
+            using ::hpx::parallel::for_loop;
+            using ::hpx::parallel::execution::par;
+
+            int iblock_size = IBlockSize::value;
+            int jblock_size = JBlockSize::value;
+            for_loop(par, 0, NBI * NBJ,
+                [NBI, NBJ, iblock_size , total_i, total_j, jblock_size,
+                    &stage_loops](int_t b)
+                {
+                    int_t bi = b / NBJ;
+                    int_t bj = b - bi * NBJ;
+                    int_t i_size = bi + 1 == NBI ? total_i - bi * iblock_size : iblock_size;
+                    int_t j_size = bj + 1 == NBJ ? total_j - bj * jblock_size : jblock_size;
                     tuple_util::for_each([=](auto &&fun) { fun(bi, bj, i_size, j_size); }, stage_loops);
-                }
-            }
+                });
         }
     } // namespace hpx
 } // namespace gridtools
