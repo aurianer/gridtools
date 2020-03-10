@@ -92,23 +92,23 @@ if(GT_ENABLE_BACKEND_CUDA)
 endif(GT_ENABLE_BACKEND_CUDA)
 
 if(GT_ENABLE_BACKEND_HPX)
-    foreach(srcfile IN LISTS SOURCES)
-        add_executable(${srcfile}_hpx ${srcfile}.cpp)
-        target_link_libraries(${srcfile}_hpx regression_main GridToolsTestHPX)
-
-        gridtools_add_test(
-            NAME tests.${srcfile}_hpx_12_33_61
-            COMMAND $<TARGET_FILE:${srcfile}_hpx> 12 33 61
-            LABELS regression_hpx backend_hpx
-            )
-        gridtools_add_test(
-            NAME tests.${srcfile}_hpx_23_11_43
-            COMMAND $<TARGET_FILE:${srcfile}_hpx> 23 11 43
-            LABELS regression_hpx backend_hpx
-            )
-
-        if (srcfile IN_LIST SOURCES_PERFTEST)
-            add_dependencies(perftests ${srcfile}_hpx)
-        endif()
-    endforeach(srcfile)
+  #    foreach(srcfile IN LISTS SOURCES)
+  #        add_executable(${srcfile}_hpx ${srcfile}.cpp)
+  #        target_link_libraries(${srcfile}_hpx regression_main GridToolsTestHPX)
+  #
+  #        gridtools_add_test(
+  #            NAME tests.${srcfile}_hpx_12_33_61
+  #            COMMAND $<TARGET_FILE:${srcfile}_hpx> 12 33 61
+  #            LABELS regression_hpx backend_hpx
+  #            )
+  #        gridtools_add_test(
+  #            NAME tests.${srcfile}_hpx_23_11_43
+  #            COMMAND $<TARGET_FILE:${srcfile}_hpx> 23 11 43
+  #            LABELS regression_hpx backend_hpx
+  #            )
+  #
+  #        if (srcfile IN_LIST SOURCES_PERFTEST)
+  #            add_dependencies(perftests ${srcfile}_hpx)
+  #        endif()
+  #    endforeach(srcfile)
 endif(GT_ENABLE_BACKEND_HPX)
