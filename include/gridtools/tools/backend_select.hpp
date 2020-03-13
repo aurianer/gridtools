@@ -33,8 +33,10 @@ using backend_t = gridtools::mc::backend;
 using backend_t = gridtools::cuda::backend<>;
 #endif
 #elif defined(GT_BACKEND_HPX)
-#include "../stencil_composition/backend/hpx.hpp"
-using backend_t = gridtools::hpx::backend<>;
+//#include "../stencil_composition/backend/hpx.hpp"
+//using backend_t = gridtools::hpx::backend<>;
+#include "../stencil_composition/backend/hpx_mc.hpp"
+using backend_t = gridtools::hpx_mc::backend;
 #endif
 
 // default timer implementation
