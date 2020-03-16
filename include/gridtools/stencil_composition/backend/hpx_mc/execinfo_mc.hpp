@@ -10,9 +10,11 @@
 
 #pragma once
 
+#include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
+
 #include "../../../common/defs.hpp"
 #include "../../../common/host_device.hpp"
-#include "../../../common/omp.hpp"
 
 namespace gridtools {
     namespace hpx_mc {
@@ -55,7 +57,7 @@ namespace gridtools {
           public:
             template <class Grid>
             GT_FORCE_INLINE execinfo_mc(const Grid &grid) : m_i_grid_size(grid.i_size()), m_j_grid_size(grid.j_size()) {
-                int_t threads = omp_get_max_threads();
+                int_t threads = ::hpx::get_num_worker_threads();
 
                 // if domain is large enough (relative to the number of threads),
                 // we split only along j-axis (for prefetching reasons)

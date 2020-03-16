@@ -11,7 +11,6 @@
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/parallel/algorithm.hpp>
 
 #include <memory>
 #include <utility>
