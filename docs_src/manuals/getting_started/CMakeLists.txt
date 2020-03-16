@@ -44,6 +44,7 @@ if (NOT GT_TESTS_ICOSAHEDRAL_GRID)
         DOWNLOAD_COMMAND ""
         SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/code
         CMAKE_ARGS
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}  # Necessary to forward to work with HPX
             -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
             -DGridTools_DIR=${PROJECT_BINARY_DIR} # relies on the GridToolsConfig.cmake in the build directory (the one used for export(package))
         INSTALL_COMMAND ""
