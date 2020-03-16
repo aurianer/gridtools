@@ -34,7 +34,7 @@ namespace gridtools {
             friend void gridtools_backend_entry_point(
                 backend, Spec, Grid const &grid, DataStores external_data_stores) {
                 using stages_t = be_api::make_split_view<Spec>;
-                using all_parrallel_t =
+                using all_parallel_t =
                     typename meta::all_of<be_api::is_parallel, meta::transform<be_api::get_execution, stages_t>>::type;
 
                 tmp_allocator_mc alloc;
@@ -49,7 +49,7 @@ namespace gridtools {
                         auto info) {
                         return make_tmp_storage_mc<decltype(info.data()),
                             decltype(info.extent()),
-                            all_parrallel_t::value>(alloc, block_size);
+                            all_parallel_t::value>(alloc, block_size);
                     });
 
                 auto blocked_externals = tuple_util::transform(
@@ -74,11 +74,11 @@ namespace gridtools {
                                 return sid::add_const(info.is_const(), at_key<decltype(info.plh())>(data_stores));
                             },
                             stage_t::plh_map()));
-                        return make_loop<stage_t>(all_parrallel_t(), grid, std::move(composite), std::move(k_sizes));
+                        return make_loop<stage_t>(all_parallel_t(), grid, std::move(composite), std::move(k_sizes));
                     },
                     meta::rename<tuple, stages_t>());
 
-                run_loops(all_parrallel_t(), grid, std::move(loops));
+                run_loops(all_parallel_t(), grid, std::move(loops));
             }
         };
     } // namespace mc
