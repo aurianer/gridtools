@@ -9,6 +9,9 @@
  */
 #pragma once
 
+#include <hpx/hpx.hpp>
+#include <hpx/parallel/algorithm.hpp>
+
 #include <type_traits>
 #include <utility>
 
@@ -74,7 +77,7 @@ namespace gridtools {
                            k_start = grid.k_start(Stage::interval()),
                            k_sizes = std::move(k_sizes)](execinfo_block_kparallel_mc const &info) {
                     ptr_diff_t offset{};
-                    sid::shift(offset, sid::get_stride<dim::thread>(strides), omp_get_thread_num());
+                    sid::shift(offset, sid::get_stride<dim::thread>(strides), ::hpx::get_worker_thread_num());
                     sid::shift(offset, sid::get_stride<sid::blocked_dim<dim::i>>(strides), info.i_block);
                     sid::shift(offset, sid::get_stride<sid::blocked_dim<dim::j>>(strides), info.j_block);
                     sid::shift(offset, sid::get_stride<dim::k>(strides), info.k);
@@ -102,17 +105,21 @@ namespace gridtools {
             template <class Grid, class Loops>
             void run_loops(std::true_type, Grid const &grid, Loops loops) {
                 execinfo_mc info(grid);
-                int_t i_blocks = info.i_blocks();
-                int_t j_blocks = info.j_blocks();
-                int_t k_size = grid.k_size();
-#pragma omp parallel for collapse(3)
-                for (int_t j = 0; j < j_blocks; ++j) {
-                    for (int_t k = 0; k < k_size; ++k) {
-                        for (int_t i = 0; i < i_blocks; ++i) {
-                            tuple_util::for_each([block = info.block(i, j, k)](auto &&loop) { loop(block); }, loops);
-                        }
-                    }
-                }
+                // HPX for loop
+                using ::hpx::parallel::for_loop;
+                using ::hpx::parallel::execution::par;
+
+                for_loop(par, 0, info.i_blocks() * info.j_blocks() * grid.k_size(),
+                    [info, &loops](int_t b)
+                    {
+                        int_t i_blocks = info.i_blocks();
+                        int_t j_blocks = info.j_blocks();
+                        int_t bk = b / (i_blocks * j_blocks);
+                        int_t local_bij = b - bk * i_blocks * j_blocks;
+                        int_t bi = local_bij / j_blocks;
+                        int_t bj = local_bij - bi * j_blocks;
+                        tuple_util::for_each([block = info.block(bi, bj, bk)](auto &&loop) { loop(block); }, loops);
+                    });
             }
 
             template <class Stage, class Grid, class Composite, class KSizes>
@@ -132,7 +139,7 @@ namespace gridtools {
                            k_shift_back = -grid.k_size(Stage::interval()) * Stage::k_step(),
                            k_sizes = std::move(k_sizes)](execinfo_block_kserial_mc const &info) {
                     sid::ptr_diff_type<Composite> offset{};
-                    sid::shift(offset, sid::get_stride<dim::thread>(strides), omp_get_thread_num());
+                    sid::shift(offset, sid::get_stride<dim::thread>(strides), ::hpx::get_worker_thread_num());
                     sid::shift(offset, sid::get_stride<sid::blocked_dim<dim::i>>(strides), info.i_block);
                     sid::shift(offset, sid::get_stride<sid::blocked_dim<dim::j>>(strides), info.j_block);
                     auto ptr = origin() + offset;
@@ -153,14 +160,18 @@ namespace gridtools {
             template <class Grid, class Loops>
             void run_loops(std::false_type, Grid const &grid, Loops loops) {
                 execinfo_mc info(grid);
-                int_t i_blocks = info.i_blocks();
-                int_t j_blocks = info.j_blocks();
-#pragma omp parallel for collapse(2)
-                for (int_t j = 0; j < j_blocks; ++j) {
-                    for (int_t i = 0; i < i_blocks; ++i) {
-                        tuple_util::for_each([block = info.block(i, j)](auto &&loop) { loop(block); }, loops);
-                    }
-                }
+                // HPX for loop
+                using ::hpx::parallel::for_loop;
+                using ::hpx::parallel::execution::par;
+
+                for_loop(par, 0, info.i_blocks() * info.j_blocks(),
+                    [info, &loops](int_t b)
+                    {
+                        int_t j_blocks = info.j_blocks();
+                        int_t bi = b / j_blocks;
+                        int_t bj = b - bi * j_blocks;
+                        tuple_util::for_each([block = info.block(bi, bj)](auto &&loop) { loop(block); }, loops);
+                    });
             }
         } // namespace loops_impl_
         using loops_impl_::make_loop;

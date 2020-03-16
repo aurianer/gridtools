@@ -9,6 +9,8 @@
  */
 #pragma once
 
+#include <hpx/hpx.hpp>
+
 #include <memory>
 
 #include "../../../common/hugepage_alloc.hpp"
@@ -59,7 +61,7 @@ namespace gridtools {
                 // allocate one extra cache line to allow for offsetting the initial allocation
                 // to guarantee alignment of first element inside domain
                 constexpr std::size_t extra = (byte_alignment::value + sizeof(T) - 1) / sizeof(T);
-                return bs.i * bs.j * bs.k * omp_get_max_threads() + extra;
+                return bs.i * bs.j * bs.k * ::hpx::get_num_worker_threads() + extra;
             }
 
             template <std::size_t, class>
