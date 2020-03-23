@@ -139,26 +139,24 @@ else()
     endif(GT_ENABLE_BACKEND_CUDA)
 
     if(GT_ENABLE_BACKEND_HPX)
-      #foreach(srcfile IN LISTS SOURCES)
-        set(_tmp_sources horizontal_diffusion_hpx)
-        foreach(srcfile IN LISTS _tmp_sources)
-            add_executable(${srcfile} ${srcfile}.cpp)
-            target_link_libraries(${srcfile} regression_main GridToolsTestHPX)
+        foreach(srcfile IN LISTS SOURCES)
+            add_executable(${srcfile}_hpx ${srcfile}.cpp)
+            target_link_libraries(${srcfile}_hpx regression_main GridToolsTestHPX)
 
             gridtools_add_test(
-                NAME tests.${srcfile}_12_33_61
-                COMMAND $<TARGET_FILE:${srcfile}> 12 33 61
+                NAME tests.${srcfile}_hpx_12_33_61
+                COMMAND $<TARGET_FILE:${srcfile}_hpx> 12 33 61
                 LABELS regression_hpx backend_hpx
                 )
             gridtools_add_test(
-                NAME tests.${srcfile}_23_11_43
-                COMMAND $<TARGET_FILE:${srcfile}> 23 11 43
+                NAME tests.${srcfile}_hpx_23_11_43
+                COMMAND $<TARGET_FILE:${srcfile}_hpx> 23 11 43
                 LABELS regression_hpx backend_hpx
                 )
 
             if (srcfile IN_LIST SOURCES_PERFTEST)
-                add_dependencies(perftests ${srcfile})
-                set_property(TEST tests.${srcfile}_23_11_43 APPEND PROPERTY LABELS perftests_hpx)
+                add_dependencies(perftests ${srcfile}_hpx)
+                set_property(TEST tests.${srcfile}_hpx_23_11_43 APPEND PROPERTY LABELS perftests_hpx)
             endif()
         endforeach(srcfile)
 
