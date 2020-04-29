@@ -21,7 +21,7 @@ endfunction()
 
 if(GT_INSTALL_EXAMPLES)
     set(enabled_examples) # used in CMakeLists.txt.in, filled in install_example()
-    install_example(DIRECTORY stencil SOURCES copy_stencil horizontal_diffusion_limited tridiagonal_solver)
+    install_example(DIRECTORY stencil SOURCES copy_stencil horizontal_diffusion_hpx horizontal_diffusion_limited tridiagonal_solver)
 
     configure_file(stencil_type_erasure/CMakeLists.txt.in
         ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/stencil_type_erasure/CMakeLists.txt @ONLY)

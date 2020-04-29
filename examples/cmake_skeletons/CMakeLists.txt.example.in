@@ -26,7 +26,11 @@ foreach(srcfile IN LISTS EXAMPLES_SRCFILES)
     # one executable for each example in the list
     add_executable(${srcfile}_cpu_ifirst ${srcfile}.cpp)
     # 4) An executable/library using GridTools stencil needs to link to backend, here GridTools::stencil_cpu_ifirst
-    target_link_libraries(${srcfile}_cpu_ifirst GridTools::stencil_cpu_ifirst)
+    if (srcfile MATCHES _hpx$)
+        target_link_libraries(${srcfile}_cpu_ifirst GridTools::stencil_cpu_ifirst)
+    else()
+        target_link_libraries(${srcfile}_cpu_ifirst GridTools::stencil_cpu_ifirst_hpx)
+    endif()
     add_test(NAME ${srcfile}_cpu_ifirst COMMAND $<TARGET_FILE:${srcfile}_cpu_ifirst> 33 44 55)
 endforeach()
 
