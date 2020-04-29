@@ -9,6 +9,11 @@ function(gridtools_add_regression_test tgt_name)
     cmake_parse_arguments(ARGS "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
     foreach(key IN LISTS ARGS_KEYS)
         set(tgt ${tgt_name}_${key})
+        # We need the stencil compiler definition to initialise the HPX runtime
+        if (key STREQUAL cpu_ifirst_hpx)
+          # Private cause it is linked afterwards to the test executable anyway
+          target_link_libraries(regression_main PRIVATE ${ARGS_LIB_PREFIX}_${key})
+        endif()
         add_library(${tgt}_lib OBJECT)
         gridtools_setup_test_target(${tgt}_lib
                 SOURCES ${ARGS_SOURCES}
