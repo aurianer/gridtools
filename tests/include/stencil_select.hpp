@@ -47,6 +47,17 @@ namespace {
 namespace {
     using stencil_backend_t = gridtools::stencil::cpu_ifirst<>;
 }
+#elif defined(GT_STENCIL_CPU_IFIRST_HPX)
+#ifndef GT_STORAGE_CPU_IFIRST
+#define GT_STORAGE_CPU_IFIRST
+#endif
+#ifndef GT_TIMER_OMP
+#define GT_TIMER_OMP
+#endif
+#include <gridtools/stencil/cpu_ifirst_hpx.hpp>
+namespace {
+    using stencil_backend_t = gridtools::stencil::cpu_ifirst_hpx;
+}
 #elif defined(GT_STENCIL_GPU)
 #ifndef GT_STORAGE_GPU
 #define GT_STORAGE_GPU
