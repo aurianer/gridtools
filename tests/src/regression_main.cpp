@@ -20,6 +20,10 @@
 
 #include <gtest/gtest.h>
 
+#ifdef GT_STENCIL_CPU_IFIRST_HPX
+    #include <hpx/hpx_init.hpp>
+#endif
+
 namespace {
     struct state {
         std::array<int, 3> m_d = {};
@@ -176,6 +180,16 @@ namespace gridtools {
     } // namespace test_environment_impl_
 } // namespace gridtools
 
+int test_main(bool perf_mode) {
+    int res = RUN_ALL_TESTS();
+#ifdef GT_STENCIL_CPU_IFIRST_HPX
+    hpx::finalize();
+#endif
+    if (perf_mode && res == 0)
+        std::cout << times();
+    return res;
+}
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     auto patterns = parse_patterns(testing::FLAGS_gtest_filter);
@@ -190,8 +204,11 @@ int main(int argc, char **argv) {
         patterns.negatives.emplace_back("*/*_cmdline.*");
     }
     testing::FLAGS_gtest_filter = to_string(patterns);
-    int res = RUN_ALL_TESTS();
-    if (perf_mode && res == 0)
-        std::cout << times();
-    return res;
+#ifndef GT_STENCIL_CPU_IFIRST_HPX
+    return test_main(perf_mode);
+#else
+    hpx::util::function_nonser<int(int, char**)> run_tests =
+        hpx::util::bind(test_main, perf_mode);
+    return hpx::init(run_tests, argc, argv);
+#endif
 }
