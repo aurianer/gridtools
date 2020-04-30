@@ -14,6 +14,8 @@
 #include <stencil_select.hpp>
 #include <test_environment.hpp>
 
+#include "test_base.hpp"
+
 namespace {
     using namespace gridtools;
     using namespace stencil;
@@ -27,7 +29,7 @@ namespace {
     using env_t = vertical_test_environment<0, axis_t>;
 
     template <class>
-    using test_kcache_flush = ::testing::Test;
+    using test_kcache_flush = test_base;
 
     using types_t = meta::if_<env_t::is_enabled<stencil_backend_t>,
         ::testing::Types<env_t::apply<stencil_backend_t, double, ::gridtools::inlined_params<6, 6, 2, 6, 2>>>,

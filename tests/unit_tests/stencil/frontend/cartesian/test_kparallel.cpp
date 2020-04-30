@@ -16,6 +16,8 @@
 
 #include <stencil_select.hpp>
 
+#include "test_base.hpp"
+
 namespace {
     using namespace gridtools;
     using namespace stencil;
@@ -117,9 +119,12 @@ namespace {
             }
     }
 
-    TEST(structured_grid, kparallel_with_temporary) { run_test_with_temporary<axis<2>>(); }
+    // Can't use an alias here as for TYPED_TEST because of the TEST macro
+    class structured_grid : public test_base {};
 
-    TEST(structured_grid, kparallel_with_unused_intervals) {
+    TEST_F(structured_grid, kparallel_with_temporary) { run_test_with_temporary<axis<2>>(); }
+
+    TEST_F(structured_grid, kparallel_with_unused_intervals) {
         using Axis = axis<3>;
 
         constexpr int_t d1 = 7;
