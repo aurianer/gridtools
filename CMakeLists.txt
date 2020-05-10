@@ -130,6 +130,15 @@ if(GT_INSTALL_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
+if(TARGET gridtools)
+  set(deps gridtools)
+else(TARGET GridTools::gridtools)
+  set(deps Gridtools::gridtools)
+endif()
+message("deps : ${deps}")
+add_executable(example_hpx horizontal_diffusion_hpx.cpp)
+target_link_libraries(example_hpx PRIVATE ${deps} HPX::hpx_no_wrap_main)
+
 # absolute path to avoid collision with "export" from other packages
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/internal/export.cmake)
 
